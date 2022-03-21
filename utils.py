@@ -9,7 +9,7 @@ import streamlit as st
 # define necessary functions
 def create_random_ads(num_ads):
     runtime = np.random.randint(low=15, high=90, size=num_ads)
-    impressions = np.random.randint(low=50000, high=70000, size=num_ads)
+    impressions = np.random.randint(low=3000000, high=5000000, size=num_ads)
     ad_id = [f'ad_{i}' for i in range(num_ads)]
     
     data = pd.DataFrame({'ids':ad_id, 'length(in secs)':runtime, 'impression target':impressions})
@@ -66,7 +66,7 @@ def run_simulation(rand_nums, data):
     return sim
 
 
-def plot_sim(sim_data, num_ads, num):
+def plot_sim(sim_data, data, num_ads, num):
     """
     Take ordered simulation data as input and calculates the sum and plots the simulation 
     """
@@ -89,12 +89,16 @@ def plot_sim(sim_data, num_ads, num):
                 ad_impression_count[key].append(count)    
                 
     # plotting 
-    fig = plt.figure(figsize=(10,7))
+    fig = plt.figure(figsize=(16,10))
     plt.ylim(0,int(num/num_ads))
     plt.xlim(0,num)
-    plt.xlabel('Oppurtunity size')
-    plt.ylabel('Impressions')
+    plt.xlabel("Opportunity size ('000 units)")
+    plt.ylabel("Impressions ('000 units)")
+    plt.title('Monte Carlo simulation of ads')
     for ad in ad_impression_count.keys():
-        plt.plot(ad_num_list, ad_impression_count[ad], label=ad)
+        color = np.random.rand(3,)
+        plt.plot(ad_num_list, ad_impression_count[ad], label=ad, color=color)
+        limit = data.loc[data['ids']==ad, ['impression target']]
+        plt.hlines(y=limit/1000, xmin=0, xmax=num, color=color, linestyles={'dashed'})
     plt.legend()
     st.pyplot(fig)

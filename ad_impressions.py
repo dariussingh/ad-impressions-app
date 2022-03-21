@@ -22,6 +22,7 @@ data['Date'] = pd.to_datetime(data['Date'], format="%b %d '%y")
 data['Day'] = data['Date'].apply(lambda x: x.strftime('%A'))
 data['Month'] = data['Date'].apply(lambda x: x.strftime('%B'))
 
+
 n_steps = st.slider('Number of steps for forecasting', 1, 14, 8)
 
 # ARMA Model
@@ -68,11 +69,10 @@ def predict(date, data, n_steps):
     return traffic, actual_exists
 
 ad_slots = st.slider('Number of ad slots', 1, 10, 4)
-date = st.date_input('Date', min_value=datetime(2022,1,1), value=datetime(2022,2,11))
-date = date.strftime('%Y-%m-%d')
+num_ads = st.slider('Number of ads quoted by client', 3,7,4)
 
 st.write('Ad-wise number of impressions target')
-ad_data = utils.create_random_ads(5)
+ad_data = utils.create_random_ads(num_ads)
 st.dataframe(ad_data)
 
 # prerequsites for MC sim
@@ -83,6 +83,8 @@ lower_limit, upper_limit = utils.split_random_interval(ad_data['rand_interval'])
 ad_data['lower_limit'] = lower_limit
 ad_data['upper_limit'] = upper_limit
 
+date = st.date_input('Date', min_value=datetime(2022,1,1), value=datetime(2022,2,11))
+date = date.strftime('%Y-%m-%d')
 
 if st.button('Run Ad Impression Modeling'):
     st.header('Modeling Prediction')
@@ -94,7 +96,8 @@ if st.button('Run Ad Impression Modeling'):
     On {date}:
     - User Traffic is between **{int(traffic-rmse)}** and **{int(traffic+rmse)}** users.
     - Opportunity Size is **{opportunity_size}**.
+    - The Monte Carlo simulation of the ads pushed through according to their impression targets given the opportunity size.The horizontal dashed lines represent the impression target for the respective ads.
     """)
-    rand_nums = utils.generate_random_num(int(opportunity_size/100))
+    rand_nums = utils.generate_random_num(int(opportunity_size/1000))
     sim = utils.run_simulation(rand_nums, ad_data)
-    utils.plot_sim(sim, ad_slots, int(opportunity_size/100))
+    utils.plot_sim(sim, ad_data, num_ads, int(opportunity_size/1000))
