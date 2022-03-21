@@ -23,7 +23,7 @@ data['Day'] = data['Date'].apply(lambda x: x.strftime('%A'))
 data['Month'] = data['Date'].apply(lambda x: x.strftime('%B'))
 
 st.write(f"Given user traffic data from {data['Date'][0].strftime('%Y-%m-%d')} to {data['Date'][len(data)-1].strftime('%Y-%m-%d')}. Use number of steps for forecasting as a hyperparameter to finetune our model for user traffic forecasting for future dates.")
-n_steps = st.slider('Number of steps for forecasting', 1, 14, 8)
+n_steps = st.slider('Number of steps for forecasting', 1, 12, 8)
 
 # ARMA Model
 model = ARIMA(data['User Traffic'], order=(n_steps,0,n_steps)) # (AR order, I order, MA order)
